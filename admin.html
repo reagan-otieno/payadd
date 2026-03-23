@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Page Not Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<!-- Backend API Client -->
+<script src="api.js"></script>
+<style>
+/* ===== SHARED VARS ===== */
+:root {
+  --bg:#050810;--bg2:#0c1122;--bg3:#111827;--card:#131c2e;--card2:#1a2540;
+  --border:#1e2d48;--accent:#f5a623;--accent2:#ff6b35;--blue:#3b82f6;
+  --green:#10b981;--purple:#8b5cf6;--red:#ef4444;--text:#f0f4ff;
+  --text2:#8899b8;--text3:#5a6a84;
+  --grad:linear-gradient(135deg,#f5a623,#ff6b35);
+  --grad-blue:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  --shadow:0 8px 32px rgba(0,0,0,.4);--radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+
+/* ===== ADMIN LOGIN PAGE ===== */
+#page-admin-login{display:none;min-height:100vh;background:var(--bg)}
+.admin-login-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+.admin-login-left{background:linear-gradient(135deg,#0c1122,#050810);padding:60px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.admin-login-left::before{content:'';position:absolute;width:400px;height:400px;background:var(--red);opacity:.05;border-radius:50%;top:-100px;right:-80px;filter:blur(60px)}
+.admin-login-left::after{content:'';position:absolute;width:300px;height:300px;background:var(--purple);opacity:.06;border-radius:50%;bottom:-60px;left:-60px;filter:blur(60px)}
+.admin-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;margin-bottom:48px}
+.admin-brand span{color:var(--accent)}
+.admin-brand small{font-size:.55rem;background:var(--red);color:#fff;padding:3px 8px;border-radius:4px;vertical-align:middle;margin-left:6px}
+.admin-login-left h2{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;line-height:1.1;margin-bottom:32px}
+.security-badges{display:flex;flex-direction:column;gap:10px}
+.sec-badge{display:flex;align-items:center;gap:10px;color:var(--text2);font-size:.9rem}
+.sec-badge span{font-size:1.2rem}
+.admin-login-right{background:var(--bg2);display:flex;align-items:center;justify-content:center;padding:40px}
+.admin-form-wrap{width:100%;max-width:400px}
+.admin-form-wrap h3{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:6px}
+.admin-form-subtitle{color:var(--text3);font-size:.85rem;margin-bottom:32px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:.85rem;font-weight:500;color:var(--text2);margin-bottom:8px}
+.form-group input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;transition:border-color .2s}
+.form-group input:focus{outline:none;border-color:var(--accent)}
+.btn-admin-login{width:100%;background:linear-gradient(135deg,var(--red),var(--purple));color:#fff;border:none;padding:14px;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:all .3s;margin-top:4px}
+.btn-admin-login:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(239,68,68,.3)}
+.login-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--red);padding:10px 14px;border-radius:10px;font-size:.85rem;margin-bottom:16px;display:none}
+.back-link{display:block;text-align:center;margin-top:20px;color:var(--text3);font-size:.85rem;text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--text)}
+.login-attempts{color:var(--text3);font-size:.78rem;text-align:center;margin-top:12px}
+
+/* ===== ADMIN DASHBOARD ===== */
+#page-admin-dash{display:none;min-height:100vh}
+.admin-topbar{position:fixed;top:0;left:240px;right:0;z-index:200;background:rgba(12,17,34,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.admin-topbar h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--text2)}
+.topbar-actions{display:flex;align-items:center;gap:12px}
+.topbar-time{color:var(--text3);font-size:.8rem}
+.btn-logout-top{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.82rem;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-logout-top:hover{background:rgba(239,68,68,.2)}
+.sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;position:fixed;left:0;top:0}
+.sidebar-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;padding:8px 12px;margin-bottom:32px}
+.sidebar-brand span{color:var(--accent)}
+.sidebar-brand small{font-size:.5rem;background:var(--red);color:#fff;padding:2px 6px;border-radius:4px;vertical-align:middle;margin-left:4px}
+.sidebar-nav{flex:1;display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;color:var(--text2);cursor:pointer;transition:all .2s;text-decoration:none;font-size:.9rem}
+.nav-item:hover{background:var(--card);color:var(--text)}
+.nav-item.active{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+.sidebar-admin-info{padding:16px 12px;border-top:1px solid var(--border);margin-top:16px}
+.admin-info-row{display:flex;align-items:center;gap:10px}
+.admin-av{width:38px;height:38px;background:linear-gradient(135deg,var(--red),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0}
+.admin-info-name{font-size:.88rem;font-weight:600}
+.admin-info-role{font-size:.72rem;color:var(--red)}
+.dash-main{margin-left:240px;padding:80px 28px 28px}
+.admin-tab{display:none}
+.admin-tab.active{display:block}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.dash-header h2{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:14px;transition:transform .2s}
+.stat-card:hover{transform:translateY(-3px)}
+.stat-card.gold{border-color:rgba(245,166,35,.3)}
+.stat-card.blue{border-color:rgba(59,130,246,.3)}
+.stat-card.green{border-color:rgba(16,185,129,.3)}
+.stat-card.purple{border-color:rgba(139,92,246,.3)}
+.stat-card.red{border-color:rgba(239,68,68,.3)}
+.stat-icon{font-size:2rem}
+.stat-card div{display:flex;flex-direction:column}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800}
+.stat-label{color:var(--text3);font-size:.78rem;margin-top:2px}
+.dash-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.dash-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;margin-bottom:16px;font-size:1rem}
+.txn-table-wrap{overflow-x:auto}
+.txn-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.txn-table th{padding:12px 16px;text-align:left;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);font-size:.78rem;letter-spacing:.5px}
+.txn-table td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2)}
+.txn-table tr:last-child td{border-bottom:none}
+.txn-table tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.75rem;font-weight:600}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-orange{background:rgba(245,166,35,.15);color:var(--accent)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-blue{background:rgba(59,130,246,.15);color:var(--blue)}
+.search-input{background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 16px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.9rem;width:240px}
+.search-input:focus{outline:none;border-color:var(--accent)}
+.btn-primary{background:var(--grad);color:#fff;border:none;padding:10px 22px;border-radius:50px;font-size:.9rem;font-weight:600;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:'DM Sans',sans-serif}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,166,35,.35)}
+.btn-sm{padding:5px 12px;border-radius:6px;font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .2s}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm-danger{border-color:rgba(239,68,68,.3);color:var(--red)}
+.btn-sm-danger:hover{background:rgba(239,68,68,.1)}
+.btn-approve{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.78rem;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-approve:hover{background:rgba(16,185,129,.3)}
+.btn-reject{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.78rem;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-reject:hover{background:rgba(239,68,68,.2)}
+.mini-user{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.mini-user-av{width:32px;height:32px;background:var(--grad-blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
+.mini-user-info{flex:1;font-size:.85rem}
+.mini-user-email{font-size:.75rem;color:var(--text3)}
+.mini-user-time{font-size:.75rem;color:var(--text3)}
+.pending-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--bg3);border-radius:10px;margin-bottom:8px}
+.pending-name{font-size:.85rem}
+.pending-amount{color:var(--accent);font-weight:700;font-size:.9rem}
+.pending-actions{display:flex;gap:6px}
+.filter-btn{background:var(--card);border:1px solid var(--border);color:var(--text2);padding:8px 18px;border-radius:50px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;transition:all .2s}
+.filter-btn.active,.filter-btn:hover{background:rgba(245,166,35,.12);border-color:var(--accent);color:var(--accent)}
+.txn-filter{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.top-item{display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg3);border-radius:10px;margin-bottom:8px}
+.top-rank{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--accent);width:24px}
+.top-name{flex:1;font-size:.9rem}
+.top-val{color:var(--green);font-weight:700;font-size:.9rem}
+.has-video{color:var(--green);font-size:.8rem;font-weight:600}
+.no-video{color:var(--text3);font-size:.8rem}
+.has-schedule{color:var(--blue);font-size:.8rem;font-weight:600}
+.no-schedule{color:var(--text3);font-size:.8rem}
+
+/* CMS MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:32px;width:480px;max-width:92vw}
+.cms-modal{width:680px;max-width:96vw;max-height:92vh;overflow-y:auto;padding:28px}
+.cms-modal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.cms-modal-header h3{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.cms-subtitle{color:var(--text3);font-size:.8rem}
+.modal-close-btn{background:var(--card);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:.9rem;transition:all .2s}
+.modal-close-btn:hover{border-color:var(--red);color:var(--red)}
+.cms-tabs{display:flex;gap:4px;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:24px}
+.cms-tab{flex:1;background:none;border:none;color:var(--text2);padding:10px 12px;border-radius:9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;transition:all .2s;white-space:nowrap}
+.cms-tab:hover{color:var(--text);background:var(--card)}
+.cms-tab.active{background:var(--card);color:var(--accent);border:1px solid rgba(245,166,35,.25);font-weight:600}
+.cms-tab-content{display:none}
+.cms-tab-content.active{display:block}
+.cms-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group-cms{margin-bottom:20px}
+.form-group-cms label{display:block;font-size:.85rem;font-weight:500;color:var(--text2);margin-bottom:8px}
+.form-group-cms input,.form-group-cms select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;transition:border-color .2s}
+.form-group-cms input:focus,.form-group-cms select:focus{outline:none;border-color:var(--accent)}
+.input-prefix-wrap{position:relative}
+.input-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--accent);font-weight:700}
+.input-prefix-wrap input{padding-left:28px}
+.req{color:var(--red);font-size:.8rem}
+.field-hint{color:var(--text3);font-size:.75rem;font-weight:400;margin-left:6px}
+.field-note{color:var(--text3);font-size:.78rem;margin-top:6px;line-height:1.5}
+.emoji-picker-row{display:flex;flex-direction:column;gap:8px}
+.emoji-presets{display:flex;gap:6px;flex-wrap:wrap}
+.emoji-presets span{font-size:1.4rem;cursor:pointer;padding:4px;border-radius:6px;transition:background .2s}
+.emoji-presets span:hover{background:rgba(245,166,35,.15)}
+.video-preview-box{width:100%;aspect-ratio:16/9;background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-top:10px}
+.video-preview-placeholder{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text3)}
+.video-preview-placeholder span{font-size:2.5rem}
+.video-preview-placeholder p{font-size:.85rem}
+.thumb-preview-row{display:flex;gap:16px;align-items:flex-start;margin-top:10px}
+.thumb-preview-box{width:180px;min-height:100px;border:1px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:.8rem;overflow:hidden;flex-shrink:0;background:var(--bg)}
+.thumb-preview-box img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.thumb-tips{color:var(--text3);font-size:.8rem;display:flex;flex-direction:column;gap:6px;line-height:1.6}
+.schedule-toggle{margin-bottom:20px}
+.toggle-label{display:flex;align-items:center;gap:12px;cursor:pointer;font-weight:600;font-size:.95rem}
+.toggle-switch{width:44px;height:24px;background:var(--border);border-radius:50px;position:relative;transition:background .3s;flex-shrink:0}
+.toggle-switch::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .3s}
+input[type=checkbox]:checked+.toggle-switch{background:var(--accent)}
+input[type=checkbox]:checked+.toggle-switch::after{transform:translateX(20px)}
+input[type=checkbox]{display:none}
+.day-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.day-btn{cursor:pointer}
+.day-btn input{display:none}
+.day-btn span{display:block;padding:6px 12px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:.82rem;transition:all .2s}
+.day-btn input:checked+span{background:rgba(245,166,35,.15);border-color:var(--accent);color:var(--accent);font-weight:600}
+.schedule-preview{background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:12px;padding:16px;margin-top:20px}
+.sched-preview-title{font-weight:700;font-size:.9rem;margin-bottom:8px}
+.cms-modal-footer{display:flex;justify-content:flex-end;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+.modal-btns{display:flex;gap:12px;margin-top:20px}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border);padding:10px 22px;border-radius:50px;font-size:.9rem;font-weight:500;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ACTIVITY LOG */
+.activity-log{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto}
+.log-entry{display:flex;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:10px;font-size:.82rem;align-items:flex-start}
+.log-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.log-text{flex:1;color:var(--text2);line-height:1.4}
+.log-time{color:var(--text3);font-size:.74rem;white-space:nowrap;flex-shrink:0}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;right:32px;z-index:9999;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:.9rem;box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(16,185,129,.4)}
+.toast.error{border-color:rgba(239,68,68,.4)}
+.toast.info{border-color:rgba(59,130,246,.4)}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div id="page-admin-login">
+  <div class="admin-login-wrap">
+    <div class="admin-login-left">
+      <div class="admin-brand">Ad<span>Pay</span><small>ADMIN</small></div>
+      <h2>Restricted<br>Access Only.</h2>
+      <div class="security-badges">
+        <div class="sec-badge"><span>🔒</span> Encrypted session</div>
+        <div class="sec-badge"><span>🚫</span> Locked out after 3 failed attempts</div>
+        <div class="sec-badge"><span>📋</span> All access is logged</div>
+        <div class="sec-badge"><span>👁</span> Activity monitored in real time</div>
+      </div>
+    </div>
+    <div class="admin-login-right">
+      <div class="admin-form-wrap">
+        <h3>Admin Portal</h3>
+        <p class="admin-form-subtitle">This area is for authorized personnel only.</p>
+        <div class="login-error" id="login-error">Incorrect credentials. Access denied.</div>
+        <div class="form-group">
+          <label>Admin Email</label>
+          <input type="email" id="admin-email" placeholder="admin@adpay.com" onkeydown="if(event.key==='Enter')adminLogin()">
+        </div>
+        <div class="form-group">
+          <label>Admin Password</label>
+          <input type="password" id="admin-pass" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()">
+        </div>
+        <div class="form-group">
+          <label>Access Key</label>
+          <input type="password" id="admin-key" placeholder="Secret access key" onkeydown="if(event.key==='Enter')adminLogin()">
+        </div>
+        <button class="btn-admin-login" onclick="adminLogin()">🔑 Access Admin Panel</button>
+        <div class="login-attempts" id="login-attempts"></div>
+        <a href="index.html" class="back-link">← Return to main site</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN DASHBOARD ===== -->
+<div id="page-admin-dash">
+  <!-- TOPBAR -->
+  <div class="admin-topbar">
+    <div class="topbar-left">
+      <span style="color:var(--red);font-size:1.2rem">🔑</span>
+      <h2 id="topbar-tab-name">Overview</h2>
+      <span id="admin-sync-badge" style="display:none;font-size:.72rem;color:var(--green);display:flex;align-items:center;gap:4px;margin-left:8px"><span style="width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;display:inline-block"></span>Live</span>
+    </div>
+    <div class="topbar-actions">
+      <span class="topbar-time" id="topbar-time"></span>
+      <button class="btn-logout-top" onclick="adminLogout()">↩ Log Out</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">Ad<span>Pay</span><small>ADMIN</small></div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" onclick="showAdminTab('overview',this)"><span>📊</span> Overview</a>
+      <a class="nav-item" onclick="showAdminTab('users',this)"><span>👥</span> Users</a>
+      <a class="nav-item" onclick="showAdminTab('ads-mgmt',this)"><span>📱</span> Manage Ads</a>
+      <a class="nav-item" onclick="showAdminTab('transactions',this)"><span>💳</span> Transactions</a>
+      <a class="nav-item" onclick="showAdminTab('analytics',this)"><span>📈</span> Analytics</a>
+      <a class="nav-item" onclick="showAdminTab('activity',this)"><span>📋</span> Activity Log</a>
+    </nav>
+    <div class="sidebar-admin-info">
+      <div class="admin-info-row">
+        <div class="admin-av">AD</div>
+        <div>
+          <div class="admin-info-name">AdPay Admin</div>
+          <div class="admin-info-role">🔑 Super Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- OVERVIEW -->
+    <div id="atab-overview" class="admin-tab active">
+      <div class="dash-header"><h2>Dashboard Overview</h2><div id="admin-date" style="color:var(--text3);font-size:.85rem"></div></div>
+      <div class="stats-row">
+        <div class="stat-card gold"><div class="stat-icon">👥</div><div><span class="stat-val" id="a-total-users">0</span><span class="stat-label">Total Users</span></div></div>
+        <div class="stat-card blue"><div class="stat-icon">📺</div><div><span class="stat-val" id="a-total-ads">0</span><span class="stat-label">Ads Watched</span></div></div>
+        <div class="stat-card green"><div class="stat-icon">💸</div><div><span class="stat-val" id="a-total-paid">$0</span><span class="stat-label">Total Paid Out</span></div></div>
+        <div class="stat-card red"><div class="stat-icon">🏦</div><div><span class="stat-val" id="a-platform-rev">$0</span><span class="stat-label">Platform Revenue</span></div></div>
+      </div>
+      <div class="dash-grid-2">
+        <div class="dash-card">
+          <div class="card-title">Recent Signups</div>
+          <div id="admin-recent-users"></div>
+        </div>
+        <div class="dash-card">
+          <div class="card-title">Pending Withdrawals</div>
+          <div id="admin-pending"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div id="atab-users" class="admin-tab">
+      <div class="dash-header">
+        <h2>👥 User Management</h2>
+        <input type="text" class="search-input" placeholder="Search users..." oninput="searchUsers(this.value)">
+      </div>
+      <div class="dash-card">
+        <div class="txn-table-wrap"><table class="txn-table">
+          <thead><tr><th>User</th><th>Email</th><th>Phone</th><th>Balance</th><th>Ads Watched</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-users-tbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ADS MANAGEMENT -->
+    <div id="atab-ads-mgmt" class="admin-tab">
+      <div class="dash-header">
+        <h2>📱 Ad Management</h2>
+        <button class="btn-primary" onclick="openAddAdModal()">+ Add New Ad</button>
+      </div>
+      <div class="dash-card">
+        <div class="txn-table-wrap"><table class="txn-table">
+          <thead><tr><th>App</th><th>Category</th><th>Pay Rate</th><th>Video</th><th>Schedule</th><th>Views</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="admin-ads-tbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div id="atab-transactions" class="admin-tab">
+      <div class="dash-header"><h2>💳 All Transactions</h2></div>
+      <div class="txn-filter">
+        <button class="filter-btn active" onclick="filterTxns('all',this)">All</button>
+        <button class="filter-btn" onclick="filterTxns('deposit',this)">Deposits</button>
+        <button class="filter-btn" onclick="filterTxns('withdrawal',this)">Withdrawals</button>
+        <button class="filter-btn" onclick="filterTxns('earning',this)">Earnings</button>
+        <button class="filter-btn" onclick="filterTxns('pending',this)">Pending</button>
+      </div>
+      <div class="dash-card">
+        <div class="txn-table-wrap"><table class="txn-table">
+          <thead><tr><th>ID</th><th>User</th><th>Type</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="admin-txn-tbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div id="atab-analytics" class="admin-tab">
+      <div class="dash-header"><h2>📈 Analytics</h2></div>
+      <div class="stats-row">
+        <div class="stat-card gold"><div class="stat-icon">📅</div><div><span class="stat-val" id="a-today-earn">$0</span><span class="stat-label">Today's Payouts</span></div></div>
+        <div class="stat-card blue"><div class="stat-icon">📅</div><div><span class="stat-val" id="a-week-earn">$0</span><span class="stat-label">This Week</span></div></div>
+        <div class="stat-card green"><div class="stat-icon">🔄</div><div><span class="stat-val" id="a-active-users">0</span><span class="stat-label">Active Users</span></div></div>
+      </div>
+      <div class="dash-grid-2">
+        <div class="dash-card"><div class="card-title">Top Earning Users</div><div id="top-earners"></div></div>
+        <div class="dash-card"><div class="card-title">Top Performing Ads</div><div id="top-ads"></div></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY LOG -->
+    <div id="atab-activity" class="admin-tab">
+      <div class="dash-header"><h2>📋 Activity Log</h2><button class="btn-primary" onclick="clearActivityLog()">Clear Log</button></div>
+      <div class="dash-card">
+        <div class="activity-log" id="activity-log-list"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD / EDIT AD MODAL -->
+<div id="add-ad-modal" class="modal-overlay" style="display:none">
+  <div class="modal cms-modal">
+    <div class="cms-modal-header">
+      <div><h3 id="ad-modal-title">➕ Add New Ad</h3><p class="cms-subtitle">Changes go live instantly — no code required</p></div>
+      <button onclick="closeAddAdModal()" class="modal-close-btn">✕</button>
+    </div>
+    <div class="cms-tabs">
+      <button class="cms-tab active" onclick="switchCmsTab('basic',this)">📋 Basic Info</button>
+      <button class="cms-tab" onclick="switchCmsTab('media',this)">🎬 Media</button>
+      <button class="cms-tab" onclick="switchCmsTab('schedule',this)">📅 Schedule</button>
+    </div>
+    <div id="cms-tab-basic" class="cms-tab-content active">
+      <div class="cms-two-col">
+        <div class="form-group-cms"><label>App Name <span class="req">*</span></label><input type="text" id="new-ad-name" placeholder="e.g. GameZone Pro"></div>
+        <div class="form-group-cms"><label>Icon Emoji</label>
+          <div class="emoji-picker-row">
+            <input type="text" id="new-ad-icon" placeholder="🎮" maxlength="4">
+            <div class="emoji-presets">
+              <span onclick="setEmoji('🎮')">🎮</span><span onclick="setEmoji('💰')">💰</span>
+              <span onclick="setEmoji('🏋️')">🏋️</span><span onclick="setEmoji('🛍️')">🛍️</span>
+              <span onclick="setEmoji('🎵')">🎵</span><span onclick="setEmoji('📚')">📚</span>
+              <span onclick="setEmoji('🚕')">🚕</span><span onclick="setEmoji('🍔')">🍔</span>
+              <span onclick="setEmoji('✈️')">✈️</span><span onclick="setEmoji('📈')">📈</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cms-two-col">
+        <div class="form-group-cms"><label>Category <span class="req">*</span></label>
+          <select id="new-ad-cat"><option value="gaming">🎮 Gaming</option><option value="finance">💰 Finance</option><option value="lifestyle">🌿 Lifestyle</option><option value="shopping">🛍️ Shopping</option><option value="health">❤️ Health</option><option value="education">📚 Education</option></select>
+        </div>
+        <div class="form-group-cms"><label>Pay Rate (USD) <span class="req">*</span></label>
+          <div class="input-prefix-wrap"><span class="input-prefix">$</span><input type="number" id="new-ad-pay" placeholder="0.50" step="0.05" min="0.05" max="5.00"></div>
+        </div>
+      </div>
+      <div class="cms-two-col">
+        <div class="form-group-cms"><label>Ad Duration (seconds)</label><input type="number" id="new-ad-duration" placeholder="30" min="5" max="120" value="30"></div>
+        <div class="form-group-cms"><label>Initial Status</label>
+          <select id="new-ad-status"><option value="active">✅ Active — live immediately</option><option value="paused">⏸ Paused — save for later</option></select>
+        </div>
+      </div>
+      <div class="form-group-cms"><label>Description</label><input type="text" id="new-ad-desc" placeholder="Short description"></div>
+    </div>
+    <div id="cms-tab-media" class="cms-tab-content">
+      <div class="form-group-cms">
+        <label>🎬 Video URL <span class="field-hint">YouTube, Vimeo, or .mp4</span></label>
+        <input type="url" id="new-ad-video" placeholder="https://youtube.com/watch?v=..." oninput="previewVideo()">
+        <div class="field-note">Paste a YouTube or Vimeo URL — it embeds automatically when users watch.</div>
+      </div>
+      <div class="video-preview-box" id="video-preview-box">
+        <div class="video-preview-placeholder" id="video-preview-placeholder"><span>🎬</span><p>Paste a video URL above to preview</p></div>
+        <iframe id="video-preview-iframe" style="display:none;width:100%;height:100%;border:none;border-radius:10px" allowfullscreen></iframe>
+      </div>
+      <div class="form-group-cms" style="margin-top:16px">
+        <label>🖼 Thumbnail URL <span class="field-hint">Optional</span></label>
+        <input type="url" id="new-ad-thumb" placeholder="https://example.com/banner.jpg" oninput="previewThumb()">
+      </div>
+      <div class="thumb-preview-row">
+        <div class="thumb-preview-box" id="thumb-preview-box"><span>No thumbnail yet</span></div>
+        <div class="thumb-tips"><p><strong>Recommended:</strong> 1280×720px (16:9)</p><p><strong>Formats:</strong> JPG, PNG, WebP</p></div>
+      </div>
+    </div>
+    <div id="cms-tab-schedule" class="cms-tab-content">
+      <div class="schedule-toggle">
+        <label class="toggle-label"><input type="checkbox" id="schedule-enabled" onchange="toggleSchedule()"><span class="toggle-switch"></span>Enable scheduling</label>
+        <p class="field-note">Ad runs only between the dates you set.</p>
+      </div>
+      <div id="schedule-fields" style="opacity:.4;pointer-events:none">
+        <div class="cms-two-col">
+          <div class="form-group-cms"><label>Start Date & Time</label><input type="datetime-local" id="new-ad-start" onchange="updateSchedulePreview()"></div>
+          <div class="form-group-cms"><label>End Date & Time</label><input type="datetime-local" id="new-ad-end" onchange="updateSchedulePreview()"></div>
+        </div>
+        <div class="form-group-cms"><label>Daily Budget (max views/day)</label><input type="number" id="new-ad-budget" placeholder="500" min="1" onchange="updateSchedulePreview()"><div class="field-note">Leave blank for unlimited.</div></div>
+        <div class="form-group-cms"><label>Days Active</label>
+          <div class="day-picker">
+            <label class="day-btn"><input type="checkbox" value="Mon" checked onchange="updateSchedulePreview()"><span>Mon</span></label>
+            <label class="day-btn"><input type="checkbox" value="Tue" checked onchange="updateSchedulePreview()"><span>Tue</span></label>
+            <label class="day-btn"><input type="checkbox" value="Wed" checked onchange="updateSchedulePreview()"><span>Wed</span></label>
+            <label class="day-btn"><input type="checkbox" value="Thu" checked onchange="updateSchedulePreview()"><span>Thu</span></label>
+            <label class="day-btn"><input type="checkbox" value="Fri" checked onchange="updateSchedulePreview()"><span>Fri</span></label>
+            <label class="day-btn"><input type="checkbox" value="Sat" onchange="updateSchedulePreview()"><span>Sat</span></label>
+            <label class="day-btn"><input type="checkbox" value="Sun" onchange="updateSchedulePreview()"><span>Sun</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="schedule-preview" id="schedule-preview" style="display:none">
+        <div class="sched-preview-title">📋 Schedule Summary</div>
+        <div id="sched-summary-text"></div>
+      </div>
+    </div>
+    <div class="cms-modal-footer">
+      <button class="btn-outline" onclick="closeAddAdModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveAd()" id="save-ad-btn">💾 Save Ad</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// =============================================
+// SECURITY GATE
+// =============================================
+const ADMIN_SECRET_KEY = 'ADPAY_ADMIN_2025';
+const ADMIN_EMAIL      = 'admin@adpay.com';
+const ADMIN_PASSWORD   = 'Admin@Secure2025!';
+const ADMIN_ACCESS_KEY = 'AP-MASTER-KEY';
+
+let loginAttempts = 0;
+let sessionActive = false;
+let activityLog = [];
+
+function logActivity(icon, text) {
+  activityLog.unshift({ icon, text, time: new Date().toLocaleTimeString() });
+  if (activityLog.length > 100) activityLog.pop();
+}
+
+// Check URL for secret key on load
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('key');
+  if (key === ADMIN_SECRET_KEY) {
+    document.title = 'AdPay Admin Portal';
+    document.getElementById('page-404').style.display = 'none';
+    document.getElementById('page-admin-login').style.display = 'block';
+    document.getElementById('admin-email').focus();
+    logActivity('🔑', 'Admin portal accessed via secret URL');
+  } else {
+    // No valid key — redirect silently to main login page
+    window.location.replace('index.html?login=1');
+  }
+});
+
+function adminLogin() {
+  if (loginAttempts >= 3) { showError('Too many failed attempts. Access temporarily locked.'); return; }
+  const email      = document.getElementById('admin-email').value.trim();
+  const pass       = document.getElementById('admin-pass').value;
+  const access_key = document.getElementById('admin-key').value.trim();
+  const btn        = document.querySelector('.btn-admin-login');
+  btn.disabled = true; btn.textContent = 'Verifying...';
+  adminLoginApi(email, pass, access_key)
+    .then(() => {
+      sessionActive = true; loginAttempts = 0;
+      document.getElementById('page-admin-login').style.display = 'none';
+      document.getElementById('page-admin-dash').style.display  = 'block';
+      window.history.replaceState({}, '', window.location.pathname);
+      logActivity('✅', `Admin logged in at ${new Date().toLocaleString()}`);
+      initAdminDashboard();
+      startTopbarClock();
+    })
+    .catch(err => {
+      loginAttempts++;
+      const rem = 3 - loginAttempts;
+      showError(`${err.message || 'Invalid credentials'}.${rem > 0 ? ' ' + rem + ' attempt' + (rem>1?'s':'') + ' remaining.' : ' Access locked.'}`);
+      document.getElementById('login-attempts').textContent = loginAttempts >= 3 ? '🔒 Locked — refresh to retry' : '';
+      logActivity('❌', `Failed admin login ${loginAttempts}/3 — ${email}`);
+    })
+    .finally(() => { btn.disabled = false; btn.textContent = '🔑 Access Admin Panel'; });
+}
+
+async function adminLoginApi(email, password, access_key) {
+  // Try real API first, fall back to hardcoded check for demo
+  try {
+    return await adminLogin(email, password, access_key);
+  } catch(e) {
+    // Fallback: check hardcoded credentials for demo mode
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD && access_key === ADMIN_ACCESS_KEY) {
+      return { token: 'demo' };
+    }
+    throw e;
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+function adminLogout() {
+  if (!confirm('Are you sure you want to log out?')) return;
+  sessionActive = false;
+  disconnectAdminSSE();
+  clearToken();
+  logActivity('↩', 'Admin logged out');
+  window.location.href = 'index.html';
+}
+
+// Block back-navigation into admin if logged out
+window.addEventListener('pageshow', e => {
+  if (!sessionActive && document.getElementById('page-admin-dash').style.display === 'block') {
+    document.getElementById('page-admin-dash').style.display = 'none';
+    document.getElementById('page-404').style.display = 'flex';
+  }
+});
+
+function startTopbarClock() {
+  const syncBadge = document.getElementById('admin-sync-badge');
+  if (syncBadge) syncBadge.style.display = 'flex';
+  function tick() { document.getElementById('topbar-time').textContent = new Date().toLocaleString(); }
+  tick(); setInterval(tick, 1000);
+  document.getElementById('admin-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+// =============================================
+// SHARED DB (mirrored from main app)
+// =============================================
+const DB = {
+  users: [
+    { id:1, name:'Ashley Kim', email:'ashley@example.com', phone:'+1-512-345-6789', balance:47.20, adsWatched:94, totalEarned:89.50, referrals:5, tier:'Pro Earner', joined:'2025-01-15', status:'active' },
+    { id:2, name:'Daniel Morris', email:'daniel@example.com', phone:'+1-312-456-7890', balance:22.80, adsWatched:46, totalEarned:32.00, referrals:2, tier:'Regular', joined:'2025-02-20', status:'active' },
+    { id:3, name:'Fiona Walsh', email:'fiona@example.com', phone:'+1-206-567-8901', balance:5.50, adsWatched:11, totalEarned:8.00, referrals:0, tier:'Starter', joined:'2025-03-01', status:'active' },
+    { id:4, name:'Marcus Torres', email:'marcus@example.com', phone:'+1-213-678-9012', balance:98.40, adsWatched:210, totalEarned:245.00, referrals:12, tier:'Pro Earner', joined:'2024-12-10', status:'active' },
+    { id:5, name:'Rachel Stone', email:'rachel@example.com', phone:'+1-404-789-0123', balance:14.20, adsWatched:31, totalEarned:21.00, referrals:1, tier:'Starter', joined:'2025-02-14', status:'suspended' },
+  ],
+  ads: [
+    { id:1, name:'GameZone Pro', category:'gaming', pay:0.50, icon:'🎮', duration:30, views:1204, status:'active', description:'Action-packed mobile gaming', videoUrl:'', thumbnail:'' },
+    { id:2, name:'CryptoWallet X', category:'finance', pay:0.60, icon:'💰', duration:25, views:887, status:'active', description:'Secure crypto wallet', videoUrl:'', thumbnail:'' },
+    { id:3, name:'FitLife Coach', category:'lifestyle', pay:0.45, icon:'🏋️', duration:20, views:643, status:'active', description:'Personal fitness & nutrition', videoUrl:'', thumbnail:'' },
+    { id:4, name:'ShopEasy', category:'shopping', pay:0.40, icon:'🛍️', duration:15, views:1567, status:'active', description:'Online shopping made easy', videoUrl:'', thumbnail:'' },
+    { id:5, name:'MusicPro Studio', category:'lifestyle', pay:0.35, icon:'🎵', duration:20, views:422, status:'active', description:'Create & discover music', videoUrl:'', thumbnail:'' },
+    { id:6, name:'LearnFast Academy', category:'education', pay:0.55, icon:'📚', duration:35, views:299, status:'active', description:'Online courses & skill building', videoUrl:'', thumbnail:'' },
+    { id:7, name:'RideShare Go', category:'lifestyle', pay:0.50, icon:'🚕', duration:25, views:754, status:'active', description:'Affordable city rides', videoUrl:'', thumbnail:'' },
+    { id:8, name:'FoodDash Delivery', category:'shopping', pay:0.45, icon:'🍔', duration:20, views:932, status:'active', description:'Fast food delivery service', videoUrl:'', thumbnail:'' },
+    { id:9, name:'InvestSmart', category:'finance', pay:0.65, icon:'📈', duration:30, views:188, status:'paused', description:'Smart investing platform', videoUrl:'', thumbnail:'' },
+    { id:10, name:'TravelLite', category:'lifestyle', pay:0.40, icon:'✈️', duration:25, views:367, status:'active', description:'Budget travel booking', videoUrl:'', thumbnail:'' },
+  ],
+  transactions: [
+    { id:'TXN001', userId:1, type:'earning', amount:0.50, method:'Ad Watch', date:'2025-03-15 14:32', status:'completed', desc:'GameZone Pro Ad' },
+    { id:'TXN002', userId:1, type:'withdrawal', amount:20.00, method:'PayPal', date:'2025-03-14 10:00', status:'completed', desc:'Withdrawal to PayPal' },
+    { id:'TXN003', userId:2, type:'deposit', amount:10.00, method:'Debit / Credit Card', date:'2025-03-13 09:15', status:'completed', desc:'Top-up deposit' },
+    { id:'TXN004', userId:4, type:'withdrawal', amount:50.00, method:'Bank Account', date:'2025-03-12 16:45', status:'pending', desc:'Withdrawal to bank' },
+    { id:'TXN005', userId:3, type:'earning', amount:0.45, method:'Ad Watch', date:'2025-03-12 11:20', status:'completed', desc:'FitLife Coach Ad' },
+    { id:'TXN006', userId:2, type:'withdrawal', amount:15.00, method:'PayPal', date:'2025-03-11 13:00', status:'pending', desc:'Withdrawal to PayPal' },
+    { id:'TXN007', userId:1, type:'deposit', amount:25.00, method:'Bank Transfer', date:'2025-03-10 08:30', status:'completed', desc:'Top-up deposit' },
+  ],
+  nextTxnId: 8
+};
+
+let allTransactions = [...DB.transactions];
+let editingAdId = null;
+// Alias firebase.js saveAd to avoid name conflict
+const saveAd_fb = typeof saveAd === 'function' ? saveAd : () => Promise.resolve();
+
+// =============================================
+// INIT
+// =============================================
+function initAdminDashboard() {
+  showAdminSkeletons();
+  loadAllAdminData();
+  // Connect SSE for real-time pushes from server
+  connectAdminSSE(onAdminSSEEvent);
+}
+
+async function loadAllAdminData() {
+  try {
+    const [stats, usersRes, txns, ads] = await Promise.all([
+      fetchAdminStats(),
+      fetchAdminUsers(),
+      fetchAdminTransactions(),
+      fetchAdminAds(),
+    ]);
+    window._adminStats = stats;
+    window._adminUsers = usersRes.users || usersRes;
+    window._adminTxns  = txns;
+    window._adminAds   = ads;
+    renderOverview(); renderAdminUsers(); renderAdminAds();
+    renderAdminTransactions(); renderAnalytics(); renderActivityLog();
+  } catch(e) {
+    console.warn('API unavailable, demo mode:', e.message);
+    window._adminUsers = DB.users;
+    window._adminTxns  = DB.transactions;
+    window._adminAds   = DB.ads;
+    renderOverview(); renderAdminUsers(); renderAdminAds();
+    renderAdminTransactions(); renderAnalytics(); renderActivityLog();
+  }
+}
+
+async function onAdminSSEEvent(event) {
+  logActivity('📡', 'Live update: ' + event.type);
+  if (['new_user','user_updated'].includes(event.type)) {
+    const r = await fetchAdminUsers().catch(()=>null);
+    if (r) { window._adminUsers = r.users||r; renderAdminUsers(); renderOverview(); renderAnalytics(); }
+  } else if (['new_transaction','transaction_updated'].includes(event.type)) {
+    const r = await fetchAdminTransactions().catch(()=>null);
+    if (r) { window._adminTxns = r; renderAdminTransactions(); renderOverview(); renderAnalytics(); }
+  } else if (event.type === 'ads_updated') {
+    const r = await fetchAdminAds().catch(()=>null);
+    if (r) { window._adminAds = r; renderAdminAds(); }
+  }
+}
+
+function showAdminSkeletons() {
+  const sk = '<div style="background:linear-gradient(90deg,#131c2e 25%,#1a2540 50%,#131c2e 75%);background-size:200%;animation:shimmer 1.2s infinite;border-radius:8px;height:40px;margin-bottom:8px"></div>';
+  ['admin-recent-users','admin-pending'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.innerHTML = sk.repeat(3);
+  });
+}
+
+function showAdminTab(tab, el) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('atab-' + tab).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('topbar-tab-name').textContent = el?.textContent?.trim() || tab;
+  logActivity('📂', `Navigated to ${tab} tab`);
+  if (tab === 'activity') renderActivityLog();
+}
+
+// =============================================
+// DATA HELPERS
+// =============================================
+function getUsers()  { return window._adminUsers || DB.users; }
+function getTxns()   { return window._adminTxns  || DB.transactions; }
+function getAds()    { return window._adminAds   || DB.ads; }
+
+function initials(name) { return (name||'').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase(); }
+function formatJoined(ts) { if (!ts) return '—'; try { return (ts.toDate?ts.toDate():new Date(ts)).toLocaleDateString(); } catch { return '—'; } }
+function formatShortDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString(); } catch { return d; } }
+function formatDate(d) { if (!d) return '—'; try { return new Date(d).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); } catch { return d; } }
+
+// =============================================
+// OVERVIEW (live Firebase data)
+// =============================================
+function renderOverview() {
+  const users = getUsers(), txns = getTxns();
+  const totalWatched = users.reduce((s,u) => s + (u.adsWatched||0), 0);
+  const totalPaid    = txns.filter(t=>t.type==='earning'&&t.status==='completed').reduce((s,t)=>s+(t.amount||0),0);
+  const revenue      = txns.filter(t=>t.type==='deposit'&&t.status==='completed').reduce((s,t)=>s+(t.amount||0),0);
+  document.getElementById('a-total-users').textContent  = users.length;
+  document.getElementById('a-total-ads').textContent    = totalWatched;
+  document.getElementById('a-total-paid').textContent   = '$' + totalPaid.toFixed(2);
+  document.getElementById('a-platform-rev').textContent = '$' + revenue.toFixed(2);
+
+  const recent = document.getElementById('admin-recent-users');
+  if (recent) recent.innerHTML = [...users]
+    .sort((a,b)=>((b.joinedAt?.seconds||0)-(a.joinedAt?.seconds||0)))
+    .slice(0,5).map(u => `
+      <div class="mini-user">
+        <div class="mini-user-av">${initials(u.name)}</div>
+        <div class="mini-user-info"><div>${u.name}</div><div class="mini-user-email">${u.email}</div></div>
+        <div class="mini-user-time">${formatJoined(u.joinedAt)||u.joined||'—'}</div>
+      </div>`).join('') || '<p style="color:var(--text3);font-size:.85rem">No users yet</p>';
+
+  const pending = txns.filter(t=>t.status==='pending'&&t.type==='withdrawal');
+  const pEl = document.getElementById('admin-pending');
+  if (pEl) pEl.innerHTML = pending.length ? pending.map(t => {
+    const user = users.find(u=>u.uid===t.uid||u.id===t.userId);
+    return `<div class="pending-item">
+      <div><div class="pending-name">${user?.name||'Unknown'}</div><div style="font-size:.75rem;color:var(--text3)">${t.method} · ${formatShortDate(t.date)}</div></div>
+      <div class="pending-amount">$${(t.amount||0).toFixed(2)}</div>
+      <div class="pending-actions">
+        <button class="btn-approve" onclick="approveTxn('${t.id}','${t.uid||''}')">Approve</button>
+        <button class="btn-reject"  onclick="rejectTxn('${t.id}','${t.uid||''}',${t.amount||0})">Reject</button>
+      </div>
+    </div>`;
+  }).join('') : '<p style="color:var(--text3);font-size:.85rem">No pending withdrawals</p>';
+}
+
+// =============================================
+// USERS (live Firebase data)
+// =============================================
+function renderAdminUsers(query='') {
+  const tbody = document.getElementById('admin-users-tbody'); if (!tbody) return;
+  const users = getUsers().filter(u => !query || u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query));
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="mini-user-av" style="width:28px;height:28px;font-size:.65rem">${initials(u.name)}</div>${u.name}</div></td>
+      <td>${u.email}</td>
+      <td>${u.phone||'—'}</td>
+      <td style="color:var(--accent)">$${(u.balance||0).toFixed(2)}</td>
+      <td>${u.adsWatched||0}</td>
+      <td><span class="badge ${u.status==='active'?'badge-green':'badge-red'}">${u.status||'active'}</span></td>
+      <td><button class="btn-sm" onclick="toggleUserStatus('${u.uid||u.id}')">${u.status==='active'?'Suspend':'Activate'}</button></td>
+    </tr>`).join('') || '<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:20px">No users found</td></tr>';
+}
+
+function searchUsers(q) { renderAdminUsers(q.toLowerCase()); }
+
+async function toggleUserStatus(uid) {
+  const users = getUsers();
+  const u = users.find(u=>u.uid===uid||u.id===uid); if (!u) return;
+  const newStatus = u.status==='active'?'suspended':'active';
+  if (isFirebaseReady) {
+    await adminUpdateUser(u.uid||uid, { status: newStatus });
+    logActivity('👤', `User ${u.name} ${newStatus}`);
+  } else {
+    u.status = newStatus;
+    renderAdminUsers(); renderOverview();
+  }
+  showToast(`${u.name} ${newStatus==='active'?'activated':'suspended'}`, newStatus==='active'?'success':'error');
+}
+
+// =============================================
+// ADS (live Firebase data)
+// =============================================
+function renderAdminAds() {
+  const tbody = document.getElementById('admin-ads-tbody'); if (!tbody) return;
+  const ads = getAds();
+  tbody.innerHTML = ads.map(ad => `
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:1.3rem">${ad.icon}</span>
+        <div><div style="font-weight:600;font-size:.88rem">${ad.name}</div>
+        ${ad.thumbnail?`<img src="${ad.thumbnail}" style="width:40px;height:24px;object-fit:cover;border-radius:4px;margin-top:3px" onerror="this.style.display='none'">`:''}</div>
+      </div></td>
+      <td>${ad.category}</td>
+      <td style="color:var(--green);font-weight:700">$${(ad.pay||0).toFixed(2)}</td>
+      <td>${ad.videoUrl?'<span class="has-video">▶ Video</span>':'<span class="no-video">— None</span>'}</td>
+      <td>${ad.schedule?'<span class="has-schedule">📅 Scheduled</span>':'<span class="no-schedule">— Always on</span>'}</td>
+      <td>${ad.views||0}</td>
+      <td><span class="badge ${ad.status==='active'?'badge-green':'badge-orange'}">${ad.status}</span></td>
+      <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn-sm" onclick="openEditAdModal('${ad.id}')">✏️ Edit</button>
+        <button class="btn-sm" onclick="toggleAdStatus('${ad.id}')">${ad.status==='active'?'Pause':'Activate'}</button>
+        <button class="btn-sm btn-sm-danger" onclick="deleteAd('${ad.id}')">Delete</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="8" style="color:var(--text3);text-align:center;padding:20px">No ads yet</td></tr>';
+}
+
+async function toggleAdStatus(id) {
+  const ads = getAds(); const ad = ads.find(a=>a.id===id); if (!ad) return;
+  const newStatus = ad.status==='active'?'paused':'active';
+  if (isFirebaseReady) { await db.collection('ads').doc(id).update({ status: newStatus }); }
+  else { ad.status=newStatus; renderAdminAds(); }
+  logActivity('📱', `Ad "${ad.name}" ${newStatus}`);
+  showToast(`${ad.name} ${newStatus}`, 'info');
+}
+
+async function deleteAd(id) {
+  const ads = getAds(); const ad = ads.find(a=>a.id===id); if (!ad) return;
+  if (!confirm(`Delete "${ad.name}"? This cannot be undone.`)) return;
+  if (isFirebaseReady) { await deleteAdFb(id); }
+  else { const idx=DB.ads.findIndex(a=>a.id===id); if(idx>-1) DB.ads.splice(idx,1); renderAdminAds(); }
+  logActivity('🗑', `Ad "${ad.name}" deleted`);
+  showToast(`${ad.name} deleted`, 'error');
+}
+
+// =============================================
+// TRANSACTIONS (live Firebase data)
+// =============================================
+let _txnFilter = 'all';
+function renderAdminTransactions(filter) {
+  if (filter) _txnFilter = filter;
+  const tbody = document.getElementById('admin-txn-tbody'); if (!tbody) return;
+  const users = getUsers(), txns = getTxns();
+  const filtered = txns.filter(t => _txnFilter==='all'||t.type===_txnFilter||t.status===_txnFilter);
+  tbody.innerHTML = filtered.map(t => {
+    const user = users.find(u=>u.uid===t.uid||u.id===t.userId);
+    return `<tr>
+      <td style="color:var(--text3);font-size:.8rem">${(t.id||'').slice(0,8)}</td>
+      <td>${user?.name||t.uid?.slice(0,8)||'Unknown'}</td>
+      <td><span class="badge ${t.type==='earning'?'badge-blue':t.type==='deposit'?'badge-green':'badge-orange'}">${t.type}</span></td>
+      <td style="color:${t.type==='withdrawal'?'var(--red)':'var(--green)'}">${t.type==='withdrawal'?'-':'+'}$${(t.amount||0).toFixed(2)}</td>
+      <td>${t.method||'—'}</td>
+      <td>${formatDate(t.date)}</td>
+      <td><span class="badge ${t.status==='completed'?'badge-green':t.status==='rejected'?'badge-red':'badge-orange'}">${t.status}</span></td>
+      <td>${t.status==='pending'?`<button class="btn-approve" onclick="approveTxn('${t.id}','${t.uid||''}')">Approve</button>`:'—'}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="8" style="color:var(--text3);text-align:center;padding:20px">No transactions</td></tr>';
+}
+
+function filterTxns(filter, btn) {
+  document.querySelectorAll('.txn-filter .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderAdminTransactions(filter);
+}
+
+async function approveTxn(id, uid) {
+  if (isFirebaseReady) { await approveTxnFb(id); }
+  else { const t=(window._adminTxns||DB.transactions).find(t=>t.id===id); if(t) t.status='completed'; renderAdminTransactions(); renderOverview(); }
+  logActivity('✅', `Transaction ${id.slice(0,8)} approved`);
+  showToast('Transaction approved ✅', 'success');
+}
+
+async function rejectTxn(id, uid, amount) {
+  if (isFirebaseReady) { await rejectTxnFb(id, uid, amount); }
+  else { const t=(window._adminTxns||DB.transactions).find(t=>t.id===id); if(t){t.status='rejected'; const u=getUsers().find(u=>u.uid===uid); if(u)u.balance+=(amount||0);} renderAdminTransactions(); renderOverview(); }
+  logActivity('❌', `Transaction ${id.slice(0,8)} rejected & refunded $${(amount||0).toFixed(2)}`);
+  showToast('Transaction rejected & refunded', 'error');
+}
+
+// =============================================
+// ANALYTICS (live Firebase data)
+// =============================================
+function renderAnalytics() {
+  const users = getUsers(), txns = getTxns(), ads = getAds();
+  const today = new Date().toISOString().split('T')[0];
+  const todayEarn = txns.filter(t=>t.type==='earning'&&(t.date||'').startsWith(today)).reduce((s,t)=>s+(t.amount||0),0);
+  const weekEarn  = txns.filter(t=>t.type==='earning').reduce((s,t)=>s+(t.amount||0),0);
+  document.getElementById('a-today-earn').textContent  = '$' + todayEarn.toFixed(2);
+  document.getElementById('a-week-earn').textContent   = '$' + weekEarn.toFixed(2);
+  document.getElementById('a-active-users').textContent= users.filter(u=>(u.adsWatched||0)>0).length;
+  const earnEl = document.getElementById('top-earners');
+  if (earnEl) earnEl.innerHTML = [...users].sort((a,b)=>(b.totalEarned||0)-(a.totalEarned||0)).slice(0,5).map((u,i)=>`<div class="top-item"><span class="top-rank">${i+1}</span><span class="top-name">${u.name}</span><span class="top-val">$${(u.totalEarned||0).toFixed(2)}</span></div>`).join('');
+  const adsEl = document.getElementById('top-ads');
+  if (adsEl) adsEl.innerHTML = [...ads].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,5).map((a,i)=>`<div class="top-item"><span class="top-rank">${i+1}</span><span class="top-name">${a.icon} ${a.name}</span><span class="top-val">${a.views||0} views</span></div>`).join('');
+}
+
+// =============================================
+// ACTIVITY LOG
+// =============================================
+function renderActivityLog() {
+  const el = document.getElementById('activity-log-list');
+  el.innerHTML = activityLog.length ? activityLog.map(e=>`
+    <div class="log-entry">
+      <span class="log-icon">${e.icon}</span>
+      <span class="log-text">${e.text}</span>
+      <span class="log-time">${e.time}</span>
+    </div>`).join('') : '<p style="color:var(--text3);font-size:.85rem;text-align:center;padding:20px">No activity recorded yet.</p>';
+}
+
+function clearActivityLog() { activityLog = []; renderActivityLog(); showToast('Activity log cleared', 'info'); }
+
+// =============================================
+// CMS AD EDITOR
+// =============================================
+function openAddAdModal() {
+  editingAdId = null;
+  document.getElementById('ad-modal-title').textContent = '➕ Add New Ad';
+  document.getElementById('save-ad-btn').textContent = '💾 Save Ad';
+  ['new-ad-name','new-ad-icon','new-ad-pay','new-ad-desc','new-ad-video','new-ad-thumb','new-ad-start','new-ad-end','new-ad-budget'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('new-ad-duration').value = 30;
+  document.getElementById('new-ad-cat').value = 'gaming';
+  document.getElementById('new-ad-status').value = 'active';
+  document.getElementById('schedule-enabled').checked = false;
+  toggleSchedule(); resetMediaPreviews();
+  switchCmsTab('basic', document.querySelector('.cms-tab'));
+  document.getElementById('add-ad-modal').style.display = 'flex';
+}
+
+function openEditAdModal(id) {
+  const ad = DB.ads.find(a=>a.id===id); if (!ad) return;
+  editingAdId = id;
+  document.getElementById('ad-modal-title').textContent = '✏️ Edit Ad — ' + ad.name;
+  document.getElementById('save-ad-btn').textContent = '💾 Update Ad';
+  document.getElementById('new-ad-name').value = ad.name;
+  document.getElementById('new-ad-icon').value = ad.icon;
+  document.getElementById('new-ad-pay').value = ad.pay;
+  document.getElementById('new-ad-duration').value = ad.duration;
+  document.getElementById('new-ad-cat').value = ad.category;
+  document.getElementById('new-ad-status').value = ad.status;
+  document.getElementById('new-ad-desc').value = ad.description||'';
+  document.getElementById('new-ad-video').value = ad.videoUrl||'';
+  document.getElementById('new-ad-thumb').value = ad.thumbnail||'';
+  if (ad.schedule) { document.getElementById('schedule-enabled').checked=true; document.getElementById('new-ad-start').value=ad.schedule.start||''; document.getElementById('new-ad-end').value=ad.schedule.end||''; document.getElementById('new-ad-budget').value=ad.schedule.budget||''; }
+  else document.getElementById('schedule-enabled').checked = false;
+  toggleSchedule(); previewVideo(); previewThumb();
+  switchCmsTab('basic', document.querySelector('.cms-tab'));
+  document.getElementById('add-ad-modal').style.display = 'flex';
+}
+
+function closeAddAdModal() { document.getElementById('add-ad-modal').style.display='none'; }
+
+async function saveAd() {
+  const name      = document.getElementById('new-ad-name').value.trim();
+  const cat       = document.getElementById('new-ad-cat').value;
+  const pay       = parseFloat(document.getElementById('new-ad-pay').value);
+  const icon      = document.getElementById('new-ad-icon').value.trim()||'📱';
+  const duration  = parseInt(document.getElementById('new-ad-duration').value)||30;
+  const status    = document.getElementById('new-ad-status').value;
+  const desc      = document.getElementById('new-ad-desc').value.trim();
+  const videoUrl  = document.getElementById('new-ad-video').value.trim();
+  const thumbnail = document.getElementById('new-ad-thumb').value.trim();
+  const schedEnabled = document.getElementById('schedule-enabled').checked;
+  const schedule  = schedEnabled ? { start:document.getElementById('new-ad-start').value, end:document.getElementById('new-ad-end').value, budget:parseInt(document.getElementById('new-ad-budget').value)||null, days:[...document.querySelectorAll('.day-btn input:checked')].map(c=>c.value) } : null;
+  if (!name) return showToast('App name is required','error');
+  if (!pay||pay<0.05) return showToast('Pay rate must be at least $0.05','error');
+
+  const adData = {name, category:cat, pay, icon, duration, status, description:desc, videoUrl, thumbnail, schedule};
+  const btn = document.getElementById('save-ad-btn');
+  if (btn) { btn.disabled=true; btn.textContent='Saving...'; }
+
+  try {
+    if (isFirebaseReady) {
+      await saveAd_fb(adData, editingAdId||null);
+      // Real-time listener will auto-update the table
+    } else {
+      if (editingAdId) {
+        const ad = getAds().find(a=>a.id===editingAdId);
+        if (ad) Object.assign(ad, adData);
+      } else {
+        DB.ads.push({id:'ad_'+Date.now(), ...adData, views:0});
+      }
+      renderAdminAds();
+    }
+    logActivity(editingAdId?'✏️':'➕', `Ad "${name}" ${editingAdId?'updated':'added'} — $${pay}/view`);
+    showToast(`✅ "${name}" ${editingAdId?'updated':'added and live'}!`, 'success');
+    closeAddAdModal();
+  } catch(e) {
+    showToast('Save failed: '+e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent='💾 Save Ad'; }
+  }
+}
+
+function switchCmsTab(tab, btn) {
+  document.querySelectorAll('.cms-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.cms-tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('cms-tab-'+tab)?.classList.add('active');
+  if (btn) btn.classList.add('active');
+  else document.querySelectorAll('.cms-tab')[0]?.classList.add('active');
+}
+
+function setEmoji(e) { document.getElementById('new-ad-icon').value=e; }
+
+function previewVideo() {
+  const url=document.getElementById('new-ad-video').value.trim();
+  const iframe=document.getElementById('video-preview-iframe');
+  const placeholder=document.getElementById('video-preview-placeholder');
+  if (!url) { iframe.style.display='none'; placeholder.style.display='flex'; return; }
+  let embedUrl='';
+  const yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  const vm=url.match(/vimeo\.com\/(\d+)/);
+  if (yt) embedUrl=`https://www.youtube.com/embed/${yt[1]}?controls=1&modestbranding=1`;
+  else if (vm) embedUrl=`https://player.vimeo.com/video/${vm[1]}`;
+  else if (url.match(/\.(mp4|webm)$/i)) embedUrl=url;
+  if (embedUrl) { iframe.src=embedUrl; iframe.style.display='block'; placeholder.style.display='none'; }
+}
+
+function previewThumb() {
+  const url=document.getElementById('new-ad-thumb').value.trim();
+  const box=document.getElementById('thumb-preview-box');
+  if (!url) { box.innerHTML='<span>No thumbnail yet</span>'; return; }
+  box.innerHTML=`<img src="${url}" alt="Thumbnail" onerror="this.parentElement.innerHTML='<span>Invalid URL</span>'">`;
+}
+
+function resetMediaPreviews() {
+  const iframe=document.getElementById('video-preview-iframe'); const ph=document.getElementById('video-preview-placeholder');
+  if (iframe) { iframe.src=''; iframe.style.display='none'; } if (ph) ph.style.display='flex';
+  const box=document.getElementById('thumb-preview-box'); if (box) box.innerHTML='<span>No thumbnail yet</span>';
+}
+
+function toggleSchedule() {
+  const enabled=document.getElementById('schedule-enabled').checked;
+  const fields=document.getElementById('schedule-fields');
+  const preview=document.getElementById('schedule-preview');
+  fields.style.opacity=enabled?'1':'0.4'; fields.style.pointerEvents=enabled?'auto':'none';
+  preview.style.display=enabled?'block':'none';
+  if (enabled) updateSchedulePreview();
+}
+
+function updateSchedulePreview() {
+  const start=document.getElementById('new-ad-start').value;
+  const end=document.getElementById('new-ad-end').value;
+  const budget=document.getElementById('new-ad-budget').value;
+  const days=[...document.querySelectorAll('.day-btn input:checked')].map(c=>c.value);
+  let text='';
+  if (start) text+=`<div>▶ Starts: <strong>${new Date(start).toLocaleString()}</strong></div>`;
+  if (end) text+=`<div>⏹ Ends: <strong>${new Date(end).toLocaleString()}</strong></div>`;
+  if (budget) text+=`<div>📊 Max views/day: <strong>${budget}</strong></div>`;
+  if (days.length) text+=`<div>📅 Active days: <strong>${days.join(', ')}</strong></div>`;
+  if (!text) text='<div style="color:var(--text3)">Fill in the fields above to see your summary.</div>';
+  document.getElementById('sched-summary-text').innerHTML=text;
+}
+
+// Close modal on overlay click
+document.getElementById('add-ad-modal').addEventListener('click',function(e){ if(e.target===this) closeAddAdModal(); });
+
+// =============================================
+// TOAST
+// =============================================
+let toastTimer;
+function showToast(msg, type='info') {
+  const t=document.getElementById('toast');
+  t.textContent=type==='success'?'✅ '+msg:type==='error'?'❌ '+msg:'ℹ️ '+msg;
+  t.className='toast show '+type;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
