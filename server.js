@@ -126,7 +126,7 @@ app.use((err, req, res, next) => {
 // BROADCAST HOOK — patch routes to emit events
 // ============================================
 // Wrap pool.query to broadcast on key mutations
-const pool = require('./db');
+const pool = require('./db.js');
 const originalQuery = pool.query.bind(pool);
 const monitoredTables = ['users', 'transactions', 'ads'];
 
