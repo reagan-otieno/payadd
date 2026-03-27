@@ -47,7 +47,7 @@ app.use('/api/admin/login', authLimiter);
 // ============================================
 // ROUTES
 // ============================================
-app.use('/api/auth',          require('./routes/auth'));
+app.use('/api/auth',          require('./auth.js'));
 app.use('/api/ads',           require('./routes/ads'));
 app.use('/api/wallet',        require('./routes/wallet'));
 app.use('/api/admin',         require('./routes/admin'));
